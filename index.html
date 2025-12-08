@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>学年×生活バランスチェッカー｜cleverkitjp</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="小学生〜高校生の睡眠・勉強・運動・スマホ時間を学年の目安と比べて、生活バランスをチェックできる無料ツールです。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page-wrapper">
+    <header class="page-header">
+      <h1 class="site-title">学年×生活バランスチェッカー</h1>
+      <p class="site-subtitle">
+        小学生〜高校生の「睡眠・家庭学習・運動・スマホ時間」を
+        学年ごとの目安と比べて、生活リズムのバランスをチェックできます。
+      </p>
+    </header>
+
+    <main>
+      <!-- 学年選択 -->
+      <section class="card">
+        <h2 class="card-title">1. 学年を選ぶ</h2>
+        <div class="form-group">
+          <label for="gradeSelect" class="form-label">学年</label>
+          <select id="gradeSelect" class="form-select">
+            <option value="">学年を選択してください</option>
+            <option value="小1">小学校1年生</option>
+            <option value="小2">小学校2年生</option>
+            <option value="小3">小学校3年生</option>
+            <option value="小4">小学校4年生</option>
+            <option value="小5">小学校5年生</option>
+            <option value="小6">小学校6年生</option>
+            <option value="中1">中学校1年生</option>
+            <option value="中2">中学校2年生</option>
+            <option value="中3">中学校3年生</option>
+            <option value="高1">高校1年生</option>
+            <option value="高2">高校2年生</option>
+            <option value="高3">高校3年生</option>
+          </select>
+          <p class_name="form-note">おおよその学年を選べば十分です。</p>
+        </div>
+      </section>
+
+      <!-- 生活リズム入力 -->
+      <section class="card">
+        <h2 class="card-title">2. 1日の生活リズムを入力</h2>
+
+        <div class="form-group">
+          <label for="sleepInput" class="form-label">
+            🛌 睡眠時間（1日あたり）
+          </label>
+          <div class="input-row">
+            <input id="sleepRange" type="range" min="0" max="12" step="0.5" value="8" class="range-input">
+            <div class="number-input-wrapper">
+              <input id="sleepInput" type="number" min="0" max="24" step="0.5" value="8" class="number-input">
+              <span class="unit-label">時間／日</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="studyInput" class="form-label">
+            ✍️ 家庭学習時間（1日あたり）
+          </label>
+          <div class="input-row">
+            <input id="studyRange" type="range" min="0" max="12" step="0.5" value="1" class="range-input">
+            <div class="number-input-wrapper">
+              <input id="studyInput" type="number" min="0" max="24" step="0.5" value="1" class="number-input">
+              <span class="unit-label">時間／日</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="exerciseInput" class="form-label">
+            🏃 運動時間（1日あたり）
+          </label>
+          <div class="input-row">
+            <input id="exerciseRange" type="range" min="0" max="12" step="0.5" value="0.5" class="range-input">
+            <div class="number-input-wrapper">
+              <input id="exerciseInput" type="number" min="0" max="24" step="0.5" value="0.5" class="number-input">
+              <span class="unit-label">時間／日</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="screenInput" class="form-label">
+            📱 スマホ・ゲーム時間（1日あたり）
+          </label>
+          <div class="input-row">
+            <input id="screenRange" type="range" min="0" max="12" step="0.5" value="2" class="range-input">
+            <div class="number-input-wrapper">
+              <input id="screenInput" type="number" min="0" max="24" step="0.5" value="2" class="number-input">
+              <span class="unit-label">時間／日</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" aria-live="polite"></div>
+
+        <div class="button-row">
+          <button id="calculateBtn" class="primary-button">
+            結果を見る
+          </button>
+        </div>
+      </section>
+
+      <!-- 結果：総合評価 -->
+      <section id="resultsSection" class="card hidden">
+        <h2 class="card-title">3. 今日のバランス</h2>
+        <p class="grade-label">
+          総合評価：<span id="overallGrade" class="grade-badge">-</span>
+        </p>
+        <p id="overallComment" class="overall-comment">
+          学年と1日の時間配分を入力すると、ここに総合コメントが表示されます。
+        </p>
+      </section>
+
+      <!-- 結果：項目別 -->
+      <section id="detailSection" class="card hidden">
+        <h2 class="card-title">項目別の目安</h2>
+        <ul id="detailResults" class="detail-list">
+          <!-- JSで項目別コメントを挿入 -->
+        </ul>
+      </section>
+
+      <!-- 参考データ -->
+      <section class="card card-subtle">
+        <button id="referenceToggle" class="reference-toggle" type="button">
+          ▼ このツールの参考データ（クリックで開く）
+        </button>
+        <div id="referenceContent" class="reference-content">
+          <p class="reference-intro">
+            このツールの基準は、文部科学省・WHO・内閣府などの公的データをもとに、
+            多くの子どもたちの生活リズムの傾向を「目安」として再構成したものです。
+            医療的・教育的な判断ではありません。
+          </p>
+
+          <h3 class="reference-heading">睡眠時間</h3>
+          <p class="reference-text">
+            WHO（世界保健機関）：6〜12歳は9〜12時間、13〜18歳は8〜10時間。<br>
+            文部科学省「全国学力・学習状況調査」における小・中学生の平均睡眠時間を参考にしています。
+          </p>
+
+          <h3 class="reference-heading">家庭学習時間</h3>
+          <p class="reference-text">
+            文部科学省「全国学力・学習状況調査」の家庭学習時間の分布から、
+            学年別の中央値を参考に目安レンジを設定しています。
+          </p>
+
+          <h3 class="reference-heading">運動時間</h3>
+          <p class="reference-text">
+            文部科学省「体力・運動能力調査」による日常の運動実施状況をもとに、
+            1日30〜60分を目安とする形で再構成しています。
+          </p>
+
+          <h3 class="reference-heading">スマホ・ゲーム時間</h3>
+          <p class="reference-text">
+            文部科学省「全国学力・学習状況調査」（中学生）や、
+            内閣府「青少年のインターネット利用環境実態調査」（高校生）の
+            利用時間分布を参考にしています。
+          </p>
+
+          <p class="reference-note">
+            生活リズムは家庭ごとに違っていて大丈夫です。このツールはあくまで「目安」としてご利用ください。
+          </p>
+        </div>
+      </section>
+
+      <!-- 注意書き -->
+      <section class="note-section">
+        <p class="note-text">
+          このツールは、家庭の生活リズムを考えるための目安です。<br>
+          個別の健康状態や学習状況について不安がある場合は、学校や医療・専門機関にご相談ください。
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
