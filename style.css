@@ -132,6 +132,39 @@ body {
   margin-left: 4px;
 }
 
+/* 睡眠（時刻入力） */
+.sleep-time-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.time-input-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+}
+
+.time-label {
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.time-input {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+.sleep-result {
+  font-size: 0.85rem;
+  color: #555;
+  margin: 6px 0 0;
+}
+
 /* ボタン */
 .button-row {
   margin-top: 12px;
@@ -200,13 +233,20 @@ body {
 }
 
 .detail-list li {
-  padding: 6px 0;
+  padding: 8px 0;
   border-bottom: 1px solid #f0eee9;
   font-size: 0.9rem;
 }
 
 .detail-list li:last-child {
   border-bottom: none;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
 }
 
 .detail-label {
@@ -217,6 +257,32 @@ body {
 .detail-mark {
   display: inline-block;
   min-width: 1.5em;
+  font-weight: 600;
+}
+
+.detail-comment {
+  margin: 2px 0 0;
+  line-height: 1.6;
+}
+
+/* 凡例 */
+.detail-legend {
+  font-size: 0.8rem;
+  color: #777;
+  margin: 4px 0 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.legend-label {
+  font-weight: 600;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
 /* 参考データ */
@@ -261,6 +327,10 @@ body {
 .reference-note {
   margin-top: 8px;
   color: #777;
+}
+
+.reference-intro {
+  margin: 0 0 6px;
 }
 
 /* 注意書き */
