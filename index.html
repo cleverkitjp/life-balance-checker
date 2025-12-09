@@ -5,7 +5,10 @@
   <title>学年×生活バランスチェッカー｜cleverkitjp</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="小学生〜高校生の睡眠・勉強・運動・スマホ・読書時間を学年ごとの目安と比べて、生活バランスをチェックできる無料ツールです。">
-　<link rel="stylesheet" href="https://cleverkitjp.github.io/common.css">
+
+  <!-- プロジェクト共通スタイル -->
+  <link rel="stylesheet" href="https://cleverkitjp.github.io/common.css">
+  <!-- このツール固有スタイル -->
   <link rel="stylesheet" href="style.css">
 
   <!-- Analytics（必要に応じてIDを差し替えてください） -->
@@ -124,6 +127,7 @@
             📖 読書時間（1日あたり）
           </label>
           <div class="input-row">
+            <input id="readingRange" type="range" min="0" max="120" step="5" value="15" class="range-input">
             <div class="number-input-wrapper">
               <input id="readingMinutesInput" type="number" min="0" max="120" step="5" value="15" class="number-input">
               <span class="unit-label">分／日</span>
@@ -228,7 +232,7 @@
 
   <script src="script.js" defer></script>
 
-  <!-- 共通フッター読込スクリプト（URLは実際のfooter.htmlに合わせて調整してください） -->
+  <!-- 共通フッター読込スクリプト -->
   <script>
     (function() {
       const footerContainer = document.getElementById("globalFooter");
