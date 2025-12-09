@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>学年×生活バランスチェッカー｜cleverkitjp</title>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9727255179923866"
+     crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="小学生〜高校生の睡眠・勉強・運動・スマホ時間を学年の目安と比べて、生活バランスをチェックできる無料ツールです。">
+  <link rel="stylesheet" href="https://cleverkitjp.github.io/common.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -180,5 +183,30 @@
   </div>
 
   <script src="script.js" defer></script>
+  <div id="ck-footer-container"></div>
+
+<script>
+  (function() {
+    var container = document.getElementById('ck-footer-container');
+    if (!container) return;
+
+    // 共通フッターを読み込み
+    fetch('https://cleverkitjp.github.io/footer.html')
+      .then(function(response) { return response.text(); })
+      .then(function(html) {
+        container.innerHTML = html;
+
+        // 広告をレンダリング
+        try {
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          console.warn('adsbygoogle error', e);
+        }
+      })
+      .catch(function(e) {
+        console.warn('footer load error', e);
+      });
+  })();
+</script>
 </body>
 </html>
