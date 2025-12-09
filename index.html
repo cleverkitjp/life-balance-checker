@@ -233,7 +233,7 @@
     (function() {
       const footerContainer = document.getElementById("globalFooter");
       if (!footerContainer) return;
-      fetch("https://cleverkitjp.github.io/shared/footer.html")
+      fetch("https://cleverkitjp.github.io/footer.html")
         .then(function(res) { return res.text(); })
         .then(function(html) {
           footerContainer.innerHTML = html;
