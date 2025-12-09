@@ -1,78 +1,90 @@
-// script.js 前半
+// script.js
 
-// 学年グループ別のモデル値
+// 学年グループ別のモデル値（時間単位：時間）
 const GRADE_MODELS = {
   elem_low: {
     label: "小1〜小3",
     grades: ["小1", "小2", "小3"],
     ranges: {
-      sleep: { min: 9.0, max: 11.0 },
-      study: { min: 0.5, max: 1.0 },
-      exercise: { min: 0.5, max: 1.0 },
-      screen: { min: 0.0, max: 1.0 }
+      sleep:   { min: 9.0,  max: 11.0 },
+      study:   { min: 0.5,  max: 1.0 },
+      exercise:{ min: 0.5,  max: 1.0 },
+      screen:  { min: 0.0,  max: 1.0 },
+      reading: { min: 0.1,  max: 0.5 } // 6〜30分
     }
   },
   elem_high: {
     label: "小4〜小6",
     grades: ["小4", "小5", "小6"],
     ranges: {
-      sleep: { min: 9.0, max: 11.0 },
-      study: { min: 1.0, max: 1.5 },
-      exercise: { min: 0.5, max: 1.0 },
-      screen: { min: 0.0, max: 1.5 }
+      sleep:   { min: 9.0,  max: 11.0 },
+      study:   { min: 1.0,  max: 1.5 },
+      exercise:{ min: 0.5,  max: 1.0 },
+      screen:  { min: 0.0,  max: 1.5 },
+      reading: { min: 0.2,  max: 0.6 } // 12〜36分
     }
   },
   junior: {
     label: "中1〜中3",
     grades: ["中1", "中2", "中3"],
     ranges: {
-      sleep: { min: 8.0, max: 10.0 },
-      study: { min: 1.0, max: 2.0 },
-      exercise: { min: 0.5, max: 1.0 },
-      screen: { min: 1.0, max: 2.5 }
+      sleep:   { min: 8.0,  max: 10.0 },
+      study:   { min: 1.0,  max: 2.0 },
+      exercise:{ min: 0.5,  max: 1.0 },
+      screen:  { min: 1.0,  max: 2.5 },
+      reading: { min: 0.1,  max: 0.5 } // 6〜30分
     }
   },
   senior: {
     label: "高1〜高3",
     grades: ["高1", "高2", "高3"],
     ranges: {
-      sleep: { min: 8.0, max: 10.0 },
-      study: { min: 1.5, max: 3.0 },
-      exercise: { min: 0.5, max: 1.0 },
-      screen: { min: 2.0, max: 3.0 }
+      sleep:   { min: 8.0,  max: 10.0 },
+      study:   { min: 1.5,  max: 3.0 },
+      exercise:{ min: 0.5,  max: 1.0 },
+      screen:  { min: 2.0,  max: 3.0 },
+      reading: { min: 0.0,  max: 0.3 } // 0〜18分
     }
   }
 };
 
-// 各項目のラベル等
+// 各項目の設定
+// type: "sleep" | "hours" | "minutes"
 const ITEM_CONFIG = {
   sleep: {
+    type: "sleep",
     label: "睡眠",
-    emoji: "🛌",
-    inputId: "sleepInput",
-    rangeId: "sleepRange"
+    emoji: "🛌"
   },
   study: {
+    type: "hours",
     label: "家庭学習",
     emoji: "✍️",
     inputId: "studyInput",
     rangeId: "studyRange"
   },
   exercise: {
+    type: "hours",
     label: "運動",
     emoji: "🏃",
     inputId: "exerciseInput",
     rangeId: "exerciseRange"
   },
   screen: {
+    type: "hours",
     label: "スマホ・ゲーム",
     emoji: "📱",
     inputId: "screenInput",
     rangeId: "screenRange"
+  },
+  reading: {
+    type: "minutes",
+    label: "読書",
+    emoji: "📖",
+    inputId: "readingMinutesInput"
   }
 };
 
-// DOM読み込み後の初期化
 document.addEventListener("DOMContentLoaded", () => {
   const gradeSelect = document.getElementById("gradeSelect");
   const calculateBtn = document.getElementById("calculateBtn");
@@ -80,9 +92,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const referenceToggle = document.getElementById("referenceToggle");
   const referenceContent = document.getElementById("referenceContent");
 
-  // スライダーと数値入力の同期
+  const bedTimeEl = document.getElementById("bedTime");
+  const wakeTimeEl = document.getElementById("wakeTime");
+  const sleepHourDisplayEl = document.getElementById("sleepHourDisplay");
+
+  // スライダーと数値入力の同期（hoursタイプのみ）
   Object.keys(ITEM_CONFIG).forEach((key) => {
     const cfg = ITEM_CONFIG[key];
+    if (cfg.type !== "hours") return;
+
     const numberEl = document.getElementById(cfg.inputId);
     const rangeEl = document.getElementById(cfg.rangeId);
 
@@ -101,6 +119,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // 睡眠：就寝・起床時刻が変わったら推定睡眠時間を表示
+  function updateSleepDisplay() {
+    const hours = calculateSleepHours(bedTimeEl.value, wakeTimeEl.value);
+    if (hours == null || isNaN(hours)) {
+      sleepHourDisplayEl.textContent = "推定睡眠時間：– 時間";
+      return;
+    }
+    if (hours <= 0 || hours > 16) {
+      sleepHourDisplayEl.textContent = "推定睡眠時間：計算結果が不自然です。入力を確認してください。";
+      return;
+    }
+    const display = Math.round(hours * 10) / 10; // 1桁小数
+    sleepHourDisplayEl.textContent = "推定睡眠時間：" + display + " 時間";
+  }
+
+  if (bedTimeEl && wakeTimeEl) {
+    bedTimeEl.addEventListener("change", updateSleepDisplay);
+    wakeTimeEl.addEventListener("change", updateSleepDisplay);
+    bedTimeEl.addEventListener("input", updateSleepDisplay);
+    wakeTimeEl.addEventListener("input", updateSleepDisplay);
+  }
+
   // 結果を見るボタン
   calculateBtn.addEventListener("click", () => {
     errorMessageEl.textContent = "";
@@ -118,30 +158,57 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 入力値の取得と簡易バリデーション
+    // 睡眠時間（時間数）の計算
+    const sleepHours = calculateSleepHours(bedTimeEl.value, wakeTimeEl.value);
+    if (sleepHours == null || isNaN(sleepHours)) {
+      errorMessageEl.textContent = "睡眠の就寝・起床時刻を両方入力してください。";
+      return;
+    }
+    if (sleepHours <= 0 || sleepHours > 16) {
+      errorMessageEl.textContent = "睡眠時間の計算結果が不自然です。入力を確認してください。";
+      return;
+    }
+
     const userValues = {};
+    userValues["sleep"] = sleepHours;
+
     let hasError = false;
 
+    // その他の項目（hours / minutes）
     Object.keys(ITEM_CONFIG).forEach((key) => {
       const cfg = ITEM_CONFIG[key];
+      if (cfg.type === "sleep") return;
+
       const inputEl = document.getElementById(cfg.inputId);
-      const raw = inputEl.value;
+      if (!inputEl) return;
+
+      const raw = String(inputEl.value || "").trim();
       const value = parseFloat(raw);
 
-      if (isNaN(value)) {
+      if (raw === "" || isNaN(value)) {
         hasError = true;
         return;
       }
-      if (value < 0 || value > 24) {
-        hasError = true;
-        return;
+
+      if (cfg.type === "hours") {
+        if (value < 0 || value > 24) {
+          hasError = true;
+          return;
+        }
+        userValues[key] = value;
+      } else if (cfg.type === "minutes") {
+        if (value < 0 || value > 120) { // 読書は0〜120分を想定
+          hasError = true;
+          return;
+        }
+        const hours = value / 60.0;
+        userValues[key] = hours;
       }
-      userValues[key] = value;
     });
 
     if (hasError) {
       errorMessageEl.textContent =
-        "0〜24時間の範囲で、すべての項目に数値を入力してください。";
+        "0以上の適切な値で、すべての項目に数値を入力してください。";
       return;
     }
 
@@ -150,8 +217,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const levels = [];
 
     Object.keys(ITEM_CONFIG).forEach((key) => {
-      const value = userValues[key];
       const rangeCfg = groupModel.ranges[key];
+      if (!rangeCfg) return;
+
+      const value = userValues[key];
       const result = evaluateItem(value, rangeCfg);
       itemResults[key] = result;
       levels.push(result.level);
@@ -177,6 +246,38 @@ function getGradeGroupByGrade(grade) {
   if (GRADE_MODELS.junior.grades.includes(grade)) return "junior";
   if (GRADE_MODELS.senior.grades.includes(grade)) return "senior";
   return null;
+}
+
+// 就寝・起床時刻から睡眠時間（時間）を計算
+function calculateSleepHours(bedTimeStr, wakeTimeStr) {
+  if (!bedTimeStr || !wakeTimeStr) return null;
+
+  const bedParts = bedTimeStr.split(":");
+  const wakeParts = wakeTimeStr.split(":");
+  if (bedParts.length !== 2 || wakeParts.length !== 2) return null;
+
+  const bh = parseInt(bedParts[0], 10);
+  const bm = parseInt(bedParts[1], 10);
+  const wh = parseInt(wakeParts[0], 10);
+  const wm = parseInt(wakeParts[1], 10);
+
+  if (
+    isNaN(bh) || isNaN(bm) ||
+    isNaN(wh) || isNaN(wm) ||
+    bh < 0 || bh > 23 || wh < 0 || wh > 23 ||
+    bm < 0 || bm > 59 || wm < 0 || wm > 59
+  ) {
+    return null;
+  }
+
+  const bed = bh + bm / 60;
+  const wake = wh + wm / 60;
+
+  let hours = wake - bed;
+  if (hours <= 0) {
+    hours += 24;
+  }
+  return hours;
 }
 
 // 項目別の5段階評価
@@ -231,15 +332,15 @@ function evaluateItem(value, rangeCfg) {
   // 少なめ／多めの傾向テキスト（柔らかく）
   let tendencyText = "";
   if (value < min) {
-    tendencyText = "（目安より少なめです）";
+    tendencyText = "目安より少なめです。";
   } else if (value > max) {
-    tendencyText = "（目安より多めです）";
+    tendencyText = "目安より多めです。";
   } else if (value < mid) {
-    tendencyText = "（目安の中でもやや少なめです）";
+    tendencyText = "目安の中でもやや少なめです。";
   } else if (value > mid) {
-    tendencyText = "（目安の中でもやや多めです）";
+    tendencyText = "目安の中でもやや多めです。";
   } else {
-    tendencyText = "（おおむね真ん中付近です）";
+    tendencyText = "おおむね真ん中付近です。";
   }
 
   const fullComment = tendencyText + " " + baseComment;
@@ -251,9 +352,7 @@ function evaluateItem(value, rangeCfg) {
     tendencyText,
     fullComment
   };
-        }
-
-// script.js 後半
+}
 
 // レベル→スコア（総合評価用）
 function levelToScore(level) {
@@ -272,19 +371,19 @@ function calculateOverall(levels) {
   let grade = "C";
   let comment = "";
 
-  if (total >= 14) {
+  if (total >= 18) { // 5項目 × 4点 = 20点
     grade = "A";
     comment =
       "とても整った生活リズムです。今のバランスを大切にしていけそうです。";
-  } else if (total >= 11) {
+  } else if (total >= 14) {
     grade = "B";
     comment =
       "おおむね良い生活リズムです。気になる項目があれば、少し意識してみるとさらに安定します。";
-  } else if (total >= 8) {
+  } else if (total >= 10) {
     grade = "C";
     comment =
       "良い部分と見直しポイントが半々くらいです。無理のない範囲で少しずつ整えていきましょう。";
-  } else if (total >= 4) {
+  } else if (total >= 6) {
     grade = "D";
     comment =
       "生活リズムの気づきが得られそうです。気になる項目から一つずつ見直してみると良いかもしれません。";
@@ -321,23 +420,32 @@ function renderResults(selectedGrade, itemResults, overall) {
   Object.keys(ITEM_CONFIG).forEach((key) => {
     const cfg = ITEM_CONFIG[key];
     const result = itemResults[key];
+    if (!result) return;
 
     const li = document.createElement("li");
 
+    // 1行目：ラベル＋マーク
+    const headerDiv = document.createElement("div");
+    headerDiv.className = "detail-header";
+
     const labelSpan = document.createElement("span");
     labelSpan.className = "detail-label";
-    labelSpan.textContent = cfg.emoji + " " + cfg.label + "：";
+    labelSpan.textContent = cfg.emoji + " " + cfg.label;
 
     const markSpan = document.createElement("span");
     markSpan.className = "detail-mark";
     markSpan.textContent = result.mark;
 
-    const textSpan = document.createElement("span");
-    textSpan.textContent = " " + result.fullComment;
+    headerDiv.appendChild(labelSpan);
+    headerDiv.appendChild(markSpan);
 
-    li.appendChild(labelSpan);
-    li.appendChild(markSpan);
-    li.appendChild(textSpan);
+    // 2行目：コメント
+    const commentP = document.createElement("p");
+    commentP.className = "detail-comment";
+    commentP.textContent = result.fullComment;
+
+    li.appendChild(headerDiv);
+    li.appendChild(commentP);
     detailListEl.appendChild(li);
   });
 
