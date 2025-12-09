@@ -3,20 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <title>学年×生活バランスチェッカー｜cleverkitjp</title>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9727255179923866"
-     crossorigin="anonymous"></script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="小学生〜高校生の睡眠・勉強・運動・スマホ時間を学年の目安と比べて、生活バランスをチェックできる無料ツールです。">
-  <link rel="stylesheet" href="https://cleverkitjp.github.io/common.css">
+  <meta name="description" content="小学生〜高校生の睡眠・勉強・運動・スマホ・読書時間を学年ごとの目安と比べて、生活バランスをチェックできる無料ツールです。">
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- Analytics（必要に応じてIDを差し替えてください） -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
 </head>
 <body>
   <div class="page-wrapper">
     <header class="page-header">
       <h1 class="site-title">学年×生活バランスチェッカー</h1>
       <p class="site-subtitle">
-        小学生〜高校生の「睡眠・家庭学習・運動・スマホ時間」を
-        学年ごとの目安と比べて、生活リズムのバランスをチェックできます。
+        小学生〜高校生の「睡眠・家庭学習・運動・スマホ・読書時間」を、
+        学年ごとの目安と比べて生活リズムのバランスをチェックできます。
       </p>
     </header>
 
@@ -41,27 +48,35 @@
             <option value="高2">高校2年生</option>
             <option value="高3">高校3年生</option>
           </select>
-          <p class_name="form-note">おおよその学年を選べば十分です。</p>
+          <p class="form-note">おおよその学年を選べば十分です。</p>
         </div>
       </section>
 
       <!-- 生活リズム入力 -->
       <section class="card">
         <h2 class="card-title">2. 1日の生活リズムを入力</h2>
+        <p class="form-note">
+          ※特定の1日ではなく、直近1週間くらいの「ふだんの生活」を思い浮かべて、
+          1日あたりのおおよその時間を入力してください。
+        </p>
 
+        <!-- 睡眠：就寝・起床時刻 -->
         <div class="form-group">
-          <label for="sleepInput" class="form-label">
-            🛌 睡眠時間（1日あたり）
-          </label>
-          <div class="input-row">
-            <input id="sleepRange" type="range" min="0" max="12" step="0.5" value="8" class="range-input">
-            <div class="number-input-wrapper">
-              <input id="sleepInput" type="number" min="0" max="24" step="0.5" value="8" class="number-input">
-              <span class="unit-label">時間／日</span>
+          <label class="form-label">🛌 睡眠（寝た時間と起きた時間）</label>
+          <div class="sleep-time-row">
+            <div class="time-input-block">
+              <span class="time-label">就寝</span>
+              <input id="bedTime" type="time" class="time-input">
+            </div>
+            <div class="time-input-block">
+              <span class="time-label">起床</span>
+              <input id="wakeTime" type="time" class="time-input">
             </div>
           </div>
+          <p id="sleepHourDisplay" class="sleep-result">推定睡眠時間：– 時間</p>
         </div>
 
+        <!-- 家庭学習 -->
         <div class="form-group">
           <label for="studyInput" class="form-label">
             ✍️ 家庭学習時間（1日あたり）
@@ -75,19 +90,21 @@
           </div>
         </div>
 
+        <!-- 運動：0〜4時間 -->
         <div class="form-group">
           <label for="exerciseInput" class="form-label">
             🏃 運動時間（1日あたり）
           </label>
           <div class="input-row">
-            <input id="exerciseRange" type="range" min="0" max="12" step="0.5" value="0.5" class="range-input">
+            <input id="exerciseRange" type="range" min="0" max="4" step="0.25" value="0.5" class="range-input">
             <div class="number-input-wrapper">
-              <input id="exerciseInput" type="number" min="0" max="24" step="0.5" value="0.5" class="number-input">
+              <input id="exerciseInput" type="number" min="0" max="4" step="0.25" value="0.5" class="number-input">
               <span class="unit-label">時間／日</span>
             </div>
           </div>
         </div>
 
+        <!-- スマホ・ゲーム -->
         <div class="form-group">
           <label for="screenInput" class="form-label">
             📱 スマホ・ゲーム時間（1日あたり）
@@ -101,6 +118,20 @@
           </div>
         </div>
 
+        <!-- 読書 -->
+        <div class="form-group">
+          <label for="readingMinutesInput" class="form-label">
+            📖 読書時間（1日あたり）
+          </label>
+          <div class="input-row">
+            <div class="number-input-wrapper">
+              <input id="readingMinutesInput" type="number" min="0" max="120" step="5" value="15" class="number-input">
+              <span class="unit-label">分／日</span>
+            </div>
+          </div>
+          <p class="form-note">※毎日の読書時間の平均的な目安でかまいません。</p>
+        </div>
+
         <div id="errorMessage" class="error-message" aria-live="polite"></div>
 
         <div class="button-row">
@@ -112,7 +143,7 @@
 
       <!-- 結果：総合評価 -->
       <section id="resultsSection" class="card hidden">
-        <h2 class="card-title">3. 今日のバランス</h2>
+        <h2 class="card-title">3. 生活バランスチェック結果</h2>
         <p class="grade-label">
           総合評価：<span id="overallGrade" class="grade-badge">-</span>
         </p>
@@ -124,6 +155,16 @@
       <!-- 結果：項目別 -->
       <section id="detailSection" class="card hidden">
         <h2 class="card-title">項目別の目安</h2>
+
+        <div class="detail-legend">
+          <span class="legend-label">記号の意味：</span>
+          <span class="legend-item"><span class="detail-mark">◎</span>とても目安に近い</span>
+          <span class="legend-item"><span class="detail-mark">◯</span>おおむね目安内</span>
+          <span class="legend-item"><span class="detail-mark">△</span>やや外れている</span>
+          <span class="legend-item"><span class="detail-mark">▲</span>目安からずれている</span>
+          <span class="legend-item"><span class="detail-mark">■</span>目安と大きく異なる</span>
+        </div>
+
         <ul id="detailResults" class="detail-list">
           <!-- JSで項目別コメントを挿入 -->
         </ul>
@@ -182,31 +223,25 @@
     </main>
   </div>
 
+  <!-- 共通フッター読込エリア -->
+  <div id="globalFooter"></div>
+
   <script src="script.js" defer></script>
-  <div id="ck-footer-container"></div>
 
-<script>
-  (function() {
-    var container = document.getElementById('ck-footer-container');
-    if (!container) return;
-
-    // 共通フッターを読み込み
-    fetch('https://cleverkitjp.github.io/footer.html')
-      .then(function(response) { return response.text(); })
-      .then(function(html) {
-        container.innerHTML = html;
-
-        // 広告をレンダリング
-        try {
-          (adsbygoogle = window.adsbygoogle || []).push({});
-        } catch (e) {
-          console.warn('adsbygoogle error', e);
-        }
-      })
-      .catch(function(e) {
-        console.warn('footer load error', e);
-      });
-  })();
-</script>
+  <!-- 共通フッター読込スクリプト（URLは実際のfooter.htmlに合わせて調整してください） -->
+  <script>
+    (function() {
+      const footerContainer = document.getElementById("globalFooter");
+      if (!footerContainer) return;
+      fetch("https://cleverkitjp.github.io/shared/footer.html")
+        .then(function(res) { return res.text(); })
+        .then(function(html) {
+          footerContainer.innerHTML = html;
+        })
+        .catch(function(err) {
+          console.error("Footer load error:", err);
+        });
+    })();
+  </script>
 </body>
 </html>
